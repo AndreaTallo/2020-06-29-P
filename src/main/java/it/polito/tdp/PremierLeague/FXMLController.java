@@ -8,6 +8,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+
+import it.polito.tdp.PremierLeague.model.Adiacenza;
+import it.polito.tdp.PremierLeague.model.Match;
 import it.polito.tdp.PremierLeague.model.Model;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -39,29 +42,82 @@ public class FXMLController {
     private TextField txtMinuti; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbMese"
-    private ComboBox<?> cmbMese; // Value injected by FXMLLoader
+    private ComboBox<Integer> cmbMese; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbM1"
-    private ComboBox<?> cmbM1; // Value injected by FXMLLoader
+    private ComboBox<Match> cmbM1; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbM2"
-    private ComboBox<?> cmbM2; // Value injected by FXMLLoader
+    private ComboBox<Match> cmbM2; // Value injected by FXMLLoader
 
     @FXML // fx:id="txtResult"
     private TextArea txtResult; // Value injected by FXMLLoader
 
     @FXML
     void doConnessioneMassima(ActionEvent event) {
+    	try {
+        	int mese=cmbMese.getValue();
+        	String se=txtMinuti.getText();
+        	int minuti=Integer.parseInt(se);
+        	model.creaGrafo(mese,minuti);
+        	List<Adiacenza> lista =model.getMigliore();
+        	String s="";
+        	
+        	for(Adiacenza aa:lista) {
+        	s=s+aa.toString()+"\n";	
+        	}
+        	txtResult.setText(s);
+        	}catch(NullPointerException npe) {
+        		txtResult.setText("Errore inserire mese");
+        	}catch(NumberFormatException nfe){
+        		txtResult.setText("Errore formato minuti");
+        	}
     	
     }
 
     @FXML
     void doCreaGrafo(ActionEvent event) {
+    	try {
+    	int mese=cmbMese.getValue();
+    	String s=txtMinuti.getText();
+    	int minuti=Integer.parseInt(s);
+    	model.creaGrafo(mese,minuti);
+    	cmbM1.getItems().addAll(model.getVertici());
+    	cmbM2.getItems().addAll(model.getVertici());
+    	txtResult.setText("#Vertici "+model.getNumVertici()+"\n"+"#Archi: "+model.getNumArchi());
+    	}catch(NullPointerException npe) {
+    		txtResult.setText("Errore inserire mese");
+    	}catch(NumberFormatException nfe){
+    		txtResult.setText("Errore formato minuti");
+    	}
+
     	
     }
 
     @FXML
     void doCollegamento(ActionEvent event) {
+    	txtResult.clear();
+    	try {
+        	int mese=cmbMese.getValue();
+        	String s=txtMinuti.getText();
+        	int minuti=Integer.parseInt(s);
+        	Match m1= cmbM1.getValue();
+        	Match m2=cmbM2.getValue();
+            List<Match> result=model.getPercorso(m1, m2);
+        
+            String percorso="";
+            for(Match mm:result)
+            	s=s+mm.toString()+"\n";
+            txtResult.setText(s);
+        	
+        	}catch(NullPointerException npe) {
+        		txtResult.setText("Errore inserire mese");
+        	}catch(NumberFormatException nfe){
+        		txtResult.setText("Errore formato minuti");
+        	}
+    	
+    	
+    	
     	
     }
 
@@ -79,6 +135,9 @@ public class FXMLController {
     
     public void setModel(Model model) {
     	this.model = model;
+    	for(int i=1;i<13;i++) {
+    		cmbMese.getItems().add(i);
+    	}
   
     }
     
